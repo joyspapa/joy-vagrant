@@ -1,0 +1,106 @@
+# -*- mode: ruby -*-
+# # vi: set ft=ruby :
+
+require 'fileutils'
+require 'yaml'
+
+Vagrant.require_version ">= 1.6.0"
+
+$VBOX_VERSION = "6.0.5"
+
+# User defined config options defined in CONFIG
+$num_instances = 3
+$instance_name_prefix = "cent"
+$user = "ecube"
+$vm_memory = 2048
+$vm_cpus = 1
+
+# Defaults for config options defined in CONFIG
+$share_home = false
+$vm_gui = false
+$forwarded_ports = {}
+
+# Attempt to apply the deprecated environment variable NUM_INSTANCES to
+# $num_instances while allowing config.rb to override it
+if ENV["NUM_INSTANCES"].to_i > 0 && ENV["NUM_INSTANCES"]
+  $num_instances = ENV["NUM_INSTANCES"].to_i
+end
+
+# Use old vb_xxx config variables when set
+def vm_gui
+  $vb_gui.nil? ? $vm_gui : $vb_gui
+end
+
+def vm_memory
+  $vb_memory.nil? ? $vm_memory : $vb_memory
+end
+
+def vm_cpus
+  $vb_cpus.nil? ? $vm_cpus : $vb_cpus
+end
+
+Vagrant.configure("2") do |config|
+  #config.vbguest.iso_path = "/working/Vagrant/VBoxGuestAdditions_6.0.5-129380.iso"
+  
+  #Vagrant::Config.run do |config|
+    #config.vbguest.iso_path = "#{ENV['HOME']}/Downloads/VBoxGuestAdditions.iso"
+    # or
+  #  config.vbguest.iso_path = "http://company.server/VirtualBox/$VBOX_VERSION/VBoxGuestAdditions.iso"
+  #end
+  
+  config.vm.boot_timeout = 100
+  # always use Vagrants insecure key
+  config.ssh.insert_key = false
+
+  config.vm.box = "generic/centos7"
+  # Cenntos 7.5
+  config.vm.box_version = "1.6.0"
+  $is_rhel = config.vm.box.include? "rhel"
+
+  # enable hostmanager
+  config.hostmanager.enabled = false
+  # configure the host's /etc/hosts
+  config.hostmanager.manage_host = false
+  # configure the guest's /etc/hosts
+  config.hostmanager.manage_guest = true
+  config.hostmanager.include_offline = true
+
+  (1..$num_instances).each do |i|
+    config.vm.define vm_name = "%s-%02d" % [$instance_name_prefix, i] do |config|
+      config.vm.hostname = vm_name
+
+      config.vm.provider :virtualbox do |vb|
+        vb.gui = vm_gui
+        vb.memory = vm_memory
+        vb.cpus = vm_cpus
+      end
+
+      ip = "172.17.9.#{100+i}"
+      config.vm.network :private_network, ip: ip
+      config.vm.provision :hostmanager
+
+      # if the filesystem "vboxsf" is not available
+      config.vbguest.auto_update = false
+      
+      config.vm.provision :shell do |s|
+          s.path = '/working/Vagrant/centos75_mark/config/add-user.sh'
+          s.args = "#{$user}"
+      end
+
+      VAGRANT_COMMAND = ARGV[0]
+      if VAGRANT_COMMAND == "ssh"
+         config.ssh.username = 'ecube'
+      end
+
+      # 2019-07-05
+      #config.ssh.username = "ecube"
+
+      # mount install direcotries
+      #config.vm.synced_folder '/working/workspace/project/HNT-project/vagrant/config', "/home/vagrant/config"
+      #if i == 1
+      #    config.vm.synced_folder '/working/workspace/project/HNT-project/install', "/home/vagrant/install"
+      #end
+    end
+  end
+end
+
