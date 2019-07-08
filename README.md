@@ -1,22 +1,24 @@
-# Install Vagrant  
-_1.Install VirtualBox  
-[VirtualBox downloads](https://www.virtualbox.org/wiki/Downloads)  
-  
-_2.Install vagrant  
-[Vagrant downloads](https://www.vagrantup.com/downloads.html)  
-  
-_2.1.Install vagrant plugin  
-`$ vagrant plugin install vagrant-hostmanager`  
-`$ vagrant plugin install vagrant-vbguest`  
+# vagrant
 
-_3.Confirm Installation
-  
-```bash
-$ vagrant --version
-Vagrant 2.2.4 
+## Kafka Monitoring UI Case 1
 
-$ vagrant plugin list
-vagrant-hostmanager (1.8.9, global)
-vagrant-vbguest (0.17.2, global)
 
-```
+### Install Docker-CE in VMBox
+
+`$ sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+`$ sudo yum install -y docker-ce
+
+-- permission denied /var/run/docker.sock
+
+`$ sudo groupadd docker
+
+`$ sudo usermod -aG docker ecube
+
+`$ sudo systemctl start docker.service
+
+-- to apply, must logout
+
+
+[Kafdrop 3](https://github.com/obsidiandynamics/kafdrop) 
+
