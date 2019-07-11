@@ -5,20 +5,22 @@
 
 ### Install Docker-CE in VMBox
 
-`$ sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+```bash
+$ sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 
-`$ sudo yum install -y docker-ce
+$ sudo yum install -y docker-ce
 
--- permission denied /var/run/docker.sock
+$ sudo usermod -aG docker ecube
 
-`$ sudo groupadd docker
+$ sudo systemctl start docker.service
+```
+***(if happened this messeage "permission denied /var/run/docker.sock", you have to re-login to vmbox)***  
 
-`$ sudo usermod -aG docker ecube
+`to apply, must logout`
 
-`$ sudo systemctl start docker.service
 
--- to apply, must logout
 
+### Kafka Monitoring Reference Site  
 
 [Kafdrop 3](https://github.com/obsidiandynamics/kafdrop) 
 
