@@ -83,7 +83,7 @@ Vagrant.configure("2") do |config|
       config.vbguest.auto_update = false
       
       config.vm.provision :shell do |s|
-          s.path = './config/add-user.sh'
+          s.path = './config/provision.sh'
           s.args = "#{$user}"
       end
 
@@ -96,7 +96,7 @@ Vagrant.configure("2") do |config|
       #config.ssh.username = "ecube"
 
       # mount install direcotries
-      #config.vm.synced_folder '/working/workspace/project/HNT-project/vagrant/config', "/home/vagrant/config"
+      config.vm.synced_folder './config', "/home/vagrant/config"
       #if i == 1
       #    config.vm.synced_folder '/working/workspace/project/HNT-project/install', "/home/vagrant/install"
       #end
